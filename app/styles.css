@@ -1,133 +1,108 @@
-/* Layout */
+/* Tokens */
 :root{
-  --bg: #f5f7fa;
-  --surface: #ffffff;
-  --text: #0f1720;
-  --muted: #55606a;
-  --accent: #0b6fa4;
-  --success: #0a7a3a;
-  --warning: #b86b00;
-  --danger: #b00020;
-  --radius: 12px;
-  --card-radius: 10px;
-  --shadow: 0 6px 18px rgba(10,18,24,0.06), 0 1px 2px rgba(10,18,24,0.04);
+  --color-bg: #f5f7fa;
+  --color-surface: #ffffff;
+  --color-muted: #6b7280;
+  --color-text: #0f1724;
+  --color-primary: #0b74de;
+  --color-success: #107163;
+  --color-warning: #b45309;
+  --color-danger: #c53030;
+  --color-low: #2563eb;
+  --radius: 0.5rem;
+  --card-radius: 0.75rem;
   --gap: 1rem;
-  --max-width: 1200px;
-}
-html{box-sizing:border-box;font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";font-size:16px;line-height:1.4;color:var(--text);background:var(--bg);} 
-*,*::before,*::after{box-sizing:inherit}
-
-/* Dashboard container */
-.dashboard{
-  max-width:var(--max-width);
-  margin:1.25rem auto;
-  padding:calc(var(--gap) * 1.25);
-  display:grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap:var(--gap);
-  align-items:start;
+  --pad: 1rem;
+  --shadow: 0 6px 18px rgba(16,24,40,0.08);
+  --shadow-hover: 0 10px 30px rgba(16,24,40,0.12);
+  --focus-ring: rgba(11,116,222,0.18);
+  --type-scale-base: 1rem; /* 16px */
 }
 
-/* Card */
+/* Global layout & typographic rhythm */
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size:var(--type-scale-base);
+  line-height:1.4;
+  color:var(--color-text);
+  background:linear-gradient(180deg,var(--color-bg) 0%, #eef3f8 100%);
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+}
+
+/* Header / hero area */
+header{display:flex;align-items:center;justify-content:center;padding:2rem 1rem}
+header h1{margin:0;font-size:1.375rem;font-weight:600;color:var(--color-text);text-align:center}
+header p{margin:0;margin-top:.25rem;color:var(--color-muted);font-size:.95rem}
+
+/* Dashboard grid */
+.dashboard{width:100%;max-width:1200px;margin:0 auto;padding:0 1rem 2rem;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:clamp(0.75rem, calc(var(--gap) - 0.25rem), 1.25rem)}
+
+/* Project card visual system */
 .project-card{
-  background:var(--surface);
+  background:var(--color-surface);
   border-radius:var(--card-radius);
+  padding:calc(var(--pad) - 0.125rem);
   box-shadow:var(--shadow);
-  padding:1rem;
-  border:1px solid rgba(15,23,32,0.06);
-  display:flex;
-  flex-direction:column;
-  min-height:120px;
-  transition:transform 180ms ease, box-shadow 180ms ease;
-  cursor:default;
-}
-
-/* Hover (only for devices that support hover) */
-@media (hover: hover) and (pointer: fine){
-  .project-card:hover{
-    transform:translateY(-6px);
-    box-shadow:0 10px 30px rgba(10,18,24,0.08), 0 2px 4px rgba(10,18,24,0.05);
-  }
-}
-
-/* Active / touch feedback */
-.project-card:active{ transform:translateY(-2px); }
-
-/* Keyboard focus for accessibility */
-.project-card:focus-within{
-  outline: 3px solid rgba(11,111,164,0.12);
-  outline-offset:3px;
-}
-
-/* Project title and meta */
-.project-name{
-  font-size:1.0625rem;
-  font-weight:600;
-  margin:0 0 0.35rem 0;
-  color:var(--text);
-}
-
-.project-owner{
-  font-size:0.9375rem;
-  color:var(--muted);
-  margin-right:0.5rem;
-}
-
-.project-activity{
-  font-size:0.875rem;
-  color:var(--muted);
-  margin-left:auto;
-}
-
-.project-meta{
-  display:flex;
+  transition:box-shadow 220ms cubic-bezier(.2,.9,.2,1), transform 220ms cubic-bezier(.2,.9,.2,1);
+  border:1px solid rgba(15,23,36,0.04);
+  display:grid;
+  grid-template-columns:1fr auto;
+  grid-template-rows:auto auto;
+  grid-template-areas:
+    "name activity"
+    "owner badges";
+  gap:0.5rem 0.75rem;
   align-items:center;
-  gap:0.5rem;
-  margin-top:auto;
+}
+.project-card:hover{box-shadow:var(--shadow-hover);transform:translateY(-3px)}
+.project-card:active{transform:translateY(-1px)}
+.project-card:focus-within{outline:3px solid var(--focus-ring);outline-offset:3px}
+
+/* Make sure cards are keyboard-focusable when needed */
+.project-card[tabindex]{cursor:pointer}
+
+/* Content placement */
+.project-name{grid-area:name;margin:0;font-size:1.05rem;font-weight:600;color:var(--color-text);letter-spacing:-0.01em}
+.project-owner{grid-area:owner;color:var(--color-muted);font-size:0.92rem}
+.project-activity{grid-area:activity;color:var(--color-muted);font-size:0.9rem;text-align:right}
+.project-status, .project-priority{grid-area:badges;display:inline-flex;align-items:center;gap:0.4rem;padding:0.25rem 0.5rem;border-radius:0.5rem;font-size:0.82rem;font-weight:600}
+
+/* Badge system */
+.project-status{background:rgba(16,113,99,0.08);color:var(--color-success);border:1px solid rgba(16,113,99,0.12)}
+.project-status[data-state="warning"]{background:rgba(180,83,9,0.08);color:var(--color-warning);border:1px solid rgba(180,83,9,0.12)}
+.project-status[data-state="danger"]{background:rgba(197,48,48,0.08);color:var(--color-danger);border:1px solid rgba(197,48,48,0.12)}
+.project-priority{background:rgba(37,99,235,0.08);color:var(--color-low);border:1px solid rgba(37,99,235,0.12)}
+
+/* Ensure badges remain readable and meet contrast where practical */
+.project-status, .project-priority{min-height:1.6rem;padding-left:0.5rem;padding-right:0.5rem}
+
+/* Alignment helpers for badges when there are two badges */
+.project-card > .project-status + .project-priority,
+.project-card > .project-priority + .project-status{
+  margin-left:0.5rem
 }
 
-/* Badges & meta items */
-.project-status,
-.project-priority{
-  display:inline-flex;
-  align-items:center;
-  gap:0.375rem;
-  padding:0.25rem 0.6rem;
-  border-radius:999px;
-  font-size:0.8125rem;
-  font-weight:600;
-  color:#ffffff;
-  line-height:1;
-  letter-spacing:0.01em;
+/* Accessibility: visible focus ring for interactive elements inside cards */
+.project-card a:focus, .project-card button:focus{outline:2px dashed var(--focus-ring);outline-offset:3px}
+
+/* Responsive stacking: on small screens stack meta clearly */
+@media (max-width:640px){
+  .project-card{grid-template-columns:1fr;grid-template-areas:
+    "name"
+    "owner"
+    "activity"
+    "badges";text-align:left}
+  .project-activity{text-align:left}
 }
 
-/* Semantic status coloring */
-.project-status[data-state="on track"],
-.project-status.status-on-track{ background:var(--success); }
-.project-status[data-state="at risk"],
-.project-status.status-at-risk{ background:var(--warning); color:#111; }
-.project-status[data-state="blocked"],
-.project-status.status-blocked{ background:var(--danger); }
-
-/* Priority variants */
-.project-priority[data-priority="high"],
-.project-priority.priority-high{ background:var(--danger); color:#fff; }
-.project-priority[data-priority="medium"],
-.project-priority.priority-medium{ background:var(--warning); color:#111; }
-.project-priority[data-priority="low"],
-.project-priority.priority-low{ background:var(--success); color:#fff; }
-
-.project-card h2, .project-card h3, .project-card h4{margin:0}
-
-/* Responsive tweaks */
-@media (max-width:520px){
-  .dashboard{padding:0.75rem}
-  .project-card{padding:0.75rem}
-  .project-meta{flex-wrap:wrap;gap:0.375rem}
-  .project-activity{margin-left:0}
+/* Ensure accessible motion preferences */
+@media (prefers-reduced-motion:reduce){
+  .project-card, .project-card *{transition:none!important;animation:none!important}
 }
 
-/* Motion preferences */
-@media (prefers-reduced-motion: reduce){
-  .project-card, .project-card *{transition:none !important; animation:none !important}
-}
+/* Small utility tweaks */
+.project-card .project-name small{display:block;font-size:0.82rem;color:var(--color-muted);font-weight:500}
