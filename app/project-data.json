@@ -1,0 +1,32 @@
+{
+  "projects": [
+    {
+      "name": "Website Redesign",
+      "owner": "Aisha Khan",
+      "status": "in progress",
+      "recentActivity": "2026-06-08T14:23:00Z",
+      "priority": "high"
+    },
+    {
+      "name": "Mobile App: Onboarding Flow",
+      "owner": "Marcus Lee",
+      "status": "review",
+      "recentActivity": "2026-06-07T09:45:00Z",
+      "priority": "medium"
+    },
+    {
+      "name": "Infrastructure: CI/CD Upgrade",
+      "owner": "Sophia Martinez",
+      "status": "blocked",
+      "recentActivity": "2026-06-05T18:10:30Z",
+      "priority": "high"
+    },
+    {
+      "name": "Marketing Campaign Q3",
+      "owner": "Daniel O'Neal",
+      "status": "planning",
+      "recentActivity": "2026-06-01T12:00:00Z",
+      "priority": "low"
+    }
+  ]
+}

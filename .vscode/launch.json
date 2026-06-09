@@ -1,0 +1,20 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Run Project Pulse Dashboard",
+      "type": "pwa-chrome",
+      "request": "launch",
+      "url": "http://localhost:5500/index.html",
+      "webRoot": "${workspaceFolder}/app",
+      "cwd": "${workspaceFolder}/app",
+      "serverReadyAction": {
+        "pattern": "Serving HTTP on",
+        "uriFormat": "http://localhost:%s/index.html",
+        "action": "openExternally",
+        "port": 5500
+      },
+      "preLaunchTask": "Run Python HTTP Server"
+    }
+  ]
+}

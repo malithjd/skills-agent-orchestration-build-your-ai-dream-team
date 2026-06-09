@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Project Pulse</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <header>
+    <h1>Project Pulse</h1>
+    <p class="lead">At-a-glance status of active projects</p>
+  </header>
+
+  <main>
+    <section id="dashboard" class="dashboard" aria-live="polite" role="list">
+      <p class="loading">Loading projects…</p>
+    </section>
+
+    <section id="error-area" aria-hidden="true" style="display:none;" role="status"></section>
+  </main>
+
+  <script>
+    (function () {
+      const DASHBOARD = document.getElementById('dashboard');
+      const ERROR_AREA = document.getElementById('error-area');
+      const DATA_PATH = 'project-data.json';
+
+      function showError(message) {
+        DASHBOARD.innerHTML = '';
+        const err = document.createElement('div');
+        err.className = 'fetch-error';
+        err.setAttribute('role', 'alert');
+        err.textContent = message;
+        DASHBOARD.appendChild(err);
+        ERROR_AREA.style.display = '';
+        ERROR_AREA.setAttribute('aria-hidden', 'false');
+      }
+
+      function normalizeState(status) {
+        if (!status) return 'unknown';
+        const s = String(status).toLowerCase();
+        if (s.includes('block')) return 'blocked';
+        if (s.includes('risk')) return 'at risk';
+        if (s.includes('progress') || s.includes('in progress') || s.includes('on track') || s.includes('review')) return 'on track';
+        return s;
+      }
+
+      function formatActivity(iso) {
+        try {
+          const d = new Date(iso);
+          if (Number.isNaN(d.getTime())) return iso;
+          return d.toLocaleString();
+        } catch (e) {
+          return iso;
+        }
+      }
+
+      function slug(text) {
+        return String(text || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+      }
+
+      function makeCard(p) {
+        const article = document.createElement('article');
+        article.className = 'project-card';
+        article.setAttribute('role', 'listitem');
+        article.setAttribute('aria-labelledby', `name-${slug(p.name)}`);
+
+        const header = document.createElement('header');
+        const nameEl = document.createElement('h2');
+        nameEl.className = 'project-name';
+        nameEl.id = `name-${slug(p.name)}`;
+        nameEl.textContent = p.name || 'Unnamed project';
+
+        const ownerEl = document.createElement('p');
+        ownerEl.className = 'project-owner';
+        ownerEl.textContent = `Owner: ${p.owner || '—'}`;
+
+        header.appendChild(nameEl);
+        header.appendChild(ownerEl);
+
+        const meta = document.createElement('div');
+        meta.className = 'project-meta';
+
+        const statusEl = document.createElement('p');
+        statusEl.className = 'project-status';
+        const normState = normalizeState(p.status);
+        statusEl.dataset.state = normState;
+        statusEl.textContent = `Status: ${p.status || 'unknown'}`;
+
+        const activityEl = document.createElement('p');
+        activityEl.className = 'project-activity';
+        activityEl.textContent = `Recent activity: ${formatActivity(p.recentActivity || 'unknown')}`;
+
+        const priorityEl = document.createElement('p');
+        priorityEl.className = 'project-priority';
+        const priorityLower = (p.priority || 'medium').toLowerCase();
+        priorityEl.dataset.priority = priorityLower;
+        priorityEl.textContent = `Priority: ${p.priority || 'medium'}`;
+
+        meta.appendChild(statusEl);
+        meta.appendChild(activityEl);
+        meta.appendChild(priorityEl);
+
+        article.appendChild(header);
+        article.appendChild(meta);
+
+        return article;
+      }
+
+      function renderProjects(list) {
+        DASHBOARD.innerHTML = '';
+        if (!Array.isArray(list) || list.length === 0) {
+          const p = document.createElement('p');
+          p.className = 'no-projects';
+          p.textContent = 'No projects to display.';
+          DASHBOARD.appendChild(p);
+          return;
+        }
+
+        for (const proj of list) {
+          try {
+            const card = makeCard(proj);
+            DASHBOARD.appendChild(card);
+          } catch (e) {
+            console.error('Failed to render project', proj, e);
+          }
+        }
+      }
+
+      fetch(DATA_PATH, { cache: 'no-store' })
+        .then(response => {
+          if (!response.ok) throw new Error('Network response was not ok: ' + response.status);
+          return response.json();
+        })
+        .then(json => {
+          if (!json || !Array.isArray(json.projects)) {
+            throw new Error('Invalid data format: expected { \"projects\": [...] }');
+          }
+          renderProjects(json.projects);
+        })
+        .catch(err => {
+          console.error(err);
+          showError('Unable to load project data. ' + (err && err.message ? err.message : ''));
+        });
+    })();
+  </script>
+</body>
+</html>
